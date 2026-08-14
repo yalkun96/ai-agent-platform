@@ -1,5 +1,6 @@
 from app.core.config import settings
-from sqlachemy import create_engine, sessionmaker
+from sqlachemy import create_engine
+from sqlalchemy.orm import sessionmaker
 
 DATABASE_URL = (
     f"postgresql+psycopg://"
@@ -12,4 +13,9 @@ engine = create_engine(DATABASE_URL)
 
 SessionLocal = sessionmaker(engine)
 
-db = SessionLocal()
+def get_db():
+    db = SessionLocal()
+    try:
+        yield db
+    finally:
+        db.close()
