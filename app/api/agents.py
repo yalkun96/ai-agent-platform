@@ -4,6 +4,7 @@ from fastapi import APIRouter, Depends
 from app.schemas.agent import *
 from sqlalchemy.orm import Session
 from app.db.database import get_db
+from app.models.agent import Agent
 
 router = APIRouter()
 
