@@ -1,79 +1,47 @@
-from http.client import HTTPException
 
-from fastapi import APIRouter, Depends
+
+from fastapi import APIRouter, HTTPException
 from app.schemas.agent import *
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.agent import Agent
+from app.services.agent import *
 
 router = APIRouter()
 
 
 @router.get("/", response_model=list[AgentResponse])
 def get_agents(db: Session = Depends(get_db)):
-    return db.query(Agent).all()
+    found_agents = get_agents_service(db)
+    return found_agents
 
 
 @router.post("/", response_model=AgentResponse, status_code=201)
 def create_agent(agent: AgentCreate, db: Session = Depends(get_db)):
-    new_agent = Agent(
-        name=agent.name,
-        model=agent.model,
-        description=agent.description)
-    
-    db.add(new_agent)
-    db.commit()
-    db.refresh(new_agent)
+    new_agent = create_agent_service(agent, db)
     return new_agent
     
     
     
 @router.get("/{agent_id}", response_model=AgentResponse)
 def get_agent(agent_id: int, db: Session = Depends(get_db)):
-    agent = db.get(Agent, agent_id)
-    if agent is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Agent not found"
-        )
-    return agent
+    found_agent = get_agent_service(agent_id, db)
+    return found_agent
 
 
 
 @router.put("/{agent_id}", response_model=AgentResponse)
 def update_agent(agent_id: int, agent: AgentUpdate, 
                  db: Session = Depends(get_db)):
-    agent_to_update = db.get(Agent, agent_id)
-    if agent_to_update is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Agent not found"
-        )
-    if agent.name is not None:
-        agent_to_update.name = agent.name
-
-    if agent.model is not None:
-        agent_to_update.model = agent.model
-
-    if agent.description is not None:
-        agent_to_update.description = agent.description
-        
-    db.commit()
-    db.refresh(agent_to_update)
-    return agent_to_update
+    
+    updated_agent = update_agent_service(agent_id, agent, db)
+    return updated_agent
         
     
  
 @router.delete("/{agent_id}")
 def delete_agent(agent_id: int, db: Session = Depends(get_db)):
-    agent_to_delete = db.get(Agent, agent_id)
-    if agent_to_delete is None:
-        raise HTTPException(
-            status_code=404,
-            detail="Agent not found"
-        )
-    db.delete(agent_to_delete)
-    db.commit() 
+    delete_agent_service(agent_id, db)
     return {"message": "Agent deleted successfully"}
     
         
