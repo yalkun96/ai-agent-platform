@@ -1,13 +1,11 @@
 from sqlalchemy.orm import Session 
-from app.models.agent import Agent, AgentUpdate
+from app.models.agent import Agent
 from fastapi import HTTPException
 
 
 
 def get_agents(db: Session):
-    return db.query(Agent).all(
-        
-    )
+    return db.query(Agent).all()
     
 def get_agent_by_id(agent_id: int, db: Session):
     agent = db.get(Agent, agent_id)

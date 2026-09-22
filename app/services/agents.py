@@ -1,20 +1,20 @@
 from app.models.agent import Agent
-from app.scehemas.agent import AgentUpdate, AgentCreate, AgentResponse
+from app.schemas.agent import AgentUpdate, AgentCreate, AgentResponse
 from sqlalchemy.orm import Session 
 from fastapi import Depends, HTTPException
 from app.repositories.agent import *
-
-
+from app.models.users import User
 
 def get_agents_service(db: Session):
     all_agents = get_agents(db)
     return all_agents
     
-def create_agent_service(agent: AgentCreate, db: Session):
+def create_agent_service(agent: AgentCreate, db: Session, user: User):
     new_agent = Agent(
             name=agent.name,
             model=agent.model,
-            description=agent.description)
+            description=agent.description,
+            user_id=user.id)
     send_new_agent = save_agent(new_agent, db)
     return send_new_agent
     

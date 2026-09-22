@@ -5,7 +5,8 @@ from app.schemas.agent import *
 from sqlalchemy.orm import Session
 from app.db.database import get_db
 from app.models.agent import Agent
-from app.services.agent import *
+from app.services.agents import *
+from app.core.security import get_current_user
 
 router = APIRouter()
 
@@ -17,8 +18,11 @@ def get_agents(db: Session = Depends(get_db)):
 
 
 @router.post("/", response_model=AgentResponse, status_code=201)
-def create_agent(agent: AgentCreate, db: Session = Depends(get_db)):
-    new_agent = create_agent_service(agent, db)
+def create_agent(agent: AgentCreate, db: Session = Depends(get_db),
+                 user: User = Depends(get_current_user)):
+    
+    new_agent = create_agent_service(agent, db, user)
+    
     return new_agent
     
     
