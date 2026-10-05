@@ -5,8 +5,8 @@ from fastapi import Depends, HTTPException
 from app.repositories.agent import *
 from app.models.users import User
 
-def get_agents_service(db: Session):
-    all_agents = get_agents(db)
+def get_agents_service(user: User, db: Session):
+    all_agents = get_agents(user, db)
     return all_agents
     
 def create_agent_service(agent: AgentCreate, db: Session, user: User):
@@ -19,8 +19,8 @@ def create_agent_service(agent: AgentCreate, db: Session, user: User):
     return send_new_agent
     
 
-def get_agent_service(agent_id: int, db: Session):
-    found_agent = get_agent_by_id(agent_id, db)
+def get_agent_service(agent_id: int, db: Session, user: User):
+    found_agent = get_agent_by_id(agent_id, db, user)
     if found_agent is None:
                 raise HTTPException(
                         status_code=404,
@@ -30,9 +30,9 @@ def get_agent_service(agent_id: int, db: Session):
 
 
 def update_agent_service(agent_id: int, agent:AgentUpdate, 
-                   db: Session):
+                   db: Session, user: User):
 
-    updated_agent = get_agent_by_id(agent_id, db)
+    updated_agent = get_agent_by_id(agent_id, db, user)
 
     
     if updated_agent is None:
@@ -47,8 +47,8 @@ def update_agent_service(agent_id: int, agent:AgentUpdate,
     return updated_agent
 
 
-def delete_agent_service(agent_id: int, db: Session):
-    deleted_agent = get_agent_by_id(agent_id, db)
+def delete_agent_service(agent_id: int, db: Session, user: User):
+    deleted_agent = get_agent_by_id(agent_id, db, user)
     if deleted_agent is None:
             raise HTTPException(
                 status_code=404,

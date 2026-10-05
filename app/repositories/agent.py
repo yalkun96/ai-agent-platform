@@ -1,21 +1,27 @@
-from sqlalchemy.orm import Session 
+from sqlalchemy.orm import Session
+
 from app.models.agent import Agent
-from fastapi import HTTPException
+from app.models.users import User
 
 
+def get_agents(user: User, db: Session):
+    user_agents = db.query(Agent).filter(Agent.user_id == user.id).all()
+    return user_agents
 
-def get_agents(db: Session):
-    return db.query(Agent).all()
-    
-def get_agent_by_id(agent_id: int, db: Session):
-    agent = db.get(Agent, agent_id)
-    return agent
+
+def get_agent_by_id(agent_id: int, db: Session, user: User):
+    user_agent = (
+        db.query(Agent).filter(Agent.user_id == user.id, Agent.id == agent_id).first()
+    )
+    return user_agent
+
 
 def save_agent(agent: Agent, db: Session):
     db.add(agent)
     db.commit()
     db.refresh(agent)
     return agent
+
 
 def delete_agent(agent: Agent, db: Session):
     db.delete(agent)
