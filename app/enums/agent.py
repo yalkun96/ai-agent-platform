@@ -1,6 +1,7 @@
 from enum import Enum
 
-class AIModel(str, Enum):
-    GPT_5 = "gpt-5"
-    CLAUDE =  "claude"
-    GEMINI = "gemini"
+
+class AIProvider(str, Enum):
+    OpenAI = "openai"
+    Anthropic = "anthropic"
+    Google = "google"
